@@ -99,6 +99,9 @@ svg.chart text { font-family: "HyperMono"; fill: var(--soft); font-size: 10px; }
 const SENSES = ["Sight","Sound","Touch","Smell","Taste","Vestibular","Proprioception","Interoception"];
 const SCALE = [[0,"Not bothered. Background."],[2,"I notice it. Mildly annoying."],[4,"Hard to ignore. Focus is slipping."],[6,"Irritable, short answers, jaw or shoulders tight."],[8,"I need to leave or make it stop."],[10,"Meltdown or shutdown. I can't function."]];
 const KEY = "tmi.log.v1";
+const UNLOCK_KEY = "tmi.unlocked.v1";
+/* SHA-256 hashes of accepted unlock codes. Add a new hash to rotate the code; keep old ones so earlier buyers stay unlocked. */
+const CODE_HASHES = ["ed76886269f133b14c15403c72a417c377d12099c047dead4e5500d893ff3ef7"];
 
 /* ---------- storage ---------- */
 function blank() { return { days: {}, moments: [], settings: { sleepCut: 6, maskCut: 4, cycFrom: 24, cycTo: 28 } }; }
@@ -146,6 +149,22 @@ function confirmBox(msg, yes, onYes) {
 /* ---------- views ---------- */
 let state = { view: "today", date: todayISO(), draft: null };
 const views = {};
+
+function isUnlocked() { try { return localStorage.getItem(UNLOCK_KEY) === "yes"; } catch (e) { return sessionUnlocked; } }
+let sessionUnlocked = false;
+async function hashCode(code) {
+  const norm = code.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const pretty = norm.length === 13 ? norm.slice(0, 5) + "-" + norm.slice(5, 9) + "-" + norm.slice(9) : code.toUpperCase().trim();
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pretty));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+views.lock = () => `<h1 style="margin-top:24px">Unlock Too Much Input</h1>
+<p>Enter the unlock code from the PDF that came with your purchase. You only need to do this once on each phone.</p>
+<form id="lockform" novalidate><label for="code">Unlock code</label>
+<input id="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="QUIET-XXXX-XXXX">
+<p id="lockmsg" class="small" role="alert" style="min-height:22px;margin-top:8px"></p>
+<button class="btn wide" type="submit">Unlock</button></form>
+<div class="card" style="margin-top:22px"><p style="margin:0" class="small">Can't find your code? It's on the one-page app PDF in your download. Still stuck? Message @thatgirlwiththegreyhair on TikTok with your order number.</p></div>`;
 
 views.today = () => {
   const s = state.date, d = day(s), hi = highest(s);
@@ -270,12 +289,14 @@ ${storageOK ? "" : `<div class="note"><p style="margin:0">This browser isn't let
 <p class="small">Once it's installed it works offline.</p></div>
 <div class="card"><div style="font-weight:800;font-size:18px">Read this</div>
 <p>This app is for self-observation. It isn't a diagnosis, a treatment plan, or a substitute for a clinician who knows you. If overload is tipping into panic attacks, shutdowns that last for days, or thoughts of hurting yourself, bring in a professional. In the US you can call or text 988 at any hour.</p>
-<p class="small">Too Much Input by @thatgirlwiththegreyhair. Version 1.0.</p></div>
+<p class="small">Too Much Input by @thatgirlwiththegreyhair. Version 1.1.</p></div>
 <button class="btn ghost wide" data-act="wipe">Delete all my data</button>`;
 
 /* ---------- render + events ---------- */
 function render(focus) {
-  $("#app").innerHTML = views[state.view]();
+  const locked = !isUnlocked();
+  document.querySelector("nav.tabs").hidden = locked;
+  $("#app").innerHTML = locked ? views.lock() : views[state.view]();
   document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.view === state.view ? "page" : "false"));
   $("#hdrDate").textContent = new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" });
   if (focus) $("#app").focus();
@@ -337,8 +358,17 @@ $("#app").addEventListener("change", e => {
     });
   }
 });
-$("#app").addEventListener("submit", e => {
-  e.preventDefault(); const m = state.draft;
+$("#app").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (e.target.id === "lockform") {
+    const v = $("#code").value.trim(); const msg = $("#lockmsg");
+    if (!v) { msg.textContent = "Type your code first."; return; }
+    let h = ""; try { h = await hashCode(v); } catch (err) { msg.textContent = "This browser can't check codes. Try Safari or Chrome."; return; }
+    if (CODE_HASHES.includes(h)) { try { localStorage.setItem(UNLOCK_KEY, "yes"); } catch (err) { sessionUnlocked = true; } toast("Unlocked"); go("today"); }
+    else { msg.textContent = "That code didn't match. Check for typos, then try again."; }
+    return;
+  }
+  const m = state.draft;
   m.date = $("#m-date").value || state.date; m.time = $("#m-time").value; m.where = $("#m-where").value.trim(); m.input = $("#m-input").value.trim();
   m.body = $("#m-body").value.trim(); m.helped = $("#m-helped").value.trim();
   if (m.rating == null && !m.input) { toast("Add a rating or say what the input was"); return; }

@@ -1,4 +1,4 @@
-const CACHE = "tmi-v1.0";
+const CACHE = "tmi-v1.1";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png",
   "./fonts/next-400.woff2", "./fonts/next-600.woff2", "./fonts/next-800.woff2", "./fonts/mono-400.woff2"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
