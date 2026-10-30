@@ -1,0 +1,14 @@
+{
+  "name": "Too Much Input: sensory log",
+  "short_name": "Too Much Input",
+  "description": "Log sensory overload and spot your patterns. Your data stays on your device.",
+  "start_url": "./index.html#today",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ECEDE9",
+  "theme_color": "#3E5A6C",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

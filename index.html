@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Too Much Input: sensory log</title>
+<meta name="description" content="Log sensory overload, spot your patterns. Your data stays on your device.">
+<meta name="theme-color" content="#3E5A6C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Too Much Input">
+<style>
+@font-face { font-family: "Hyper"; src: url("fonts/next-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Hyper"; src: url("fonts/next-600.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Hyper"; src: url("fonts/next-800.woff2") format("woff2"); font-weight: 800; font-display: swap; }
+@font-face { font-family: "HyperMono"; src: url("fonts/mono-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+:root {
+  --paper: #ECEDE9; --card: #F4F5F1; --ink: #24272C; --soft: #4B5059; --slate: #3E5A6C; --slate-ink: #FFFFFF;
+  --plum: #5B4A61; --rule: #BFC3BD; --wash: #E0E2DD; --focus: #5B4A61;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --paper: #1D2024; --card: #262A2F; --ink: #E4E5E1; --soft: #AEB3B9; --slate: #8FB0C4; --slate-ink: #14181B;
+    --plum: #B9A6BF; --rule: #454B52; --wash: #2F343A; --focus: #B9A6BF; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--paper); color: var(--ink); }
+body { font-family: "Hyper", system-ui, sans-serif; font-size: 17px; line-height: 1.5; letter-spacing: 0.01em; font-variant-ligatures: none;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) calc(76px + env(safe-area-inset-bottom)) env(safe-area-inset-left); }
+@media (prefers-reduced-motion: no-preference) { button { transition: background .12s; } }
+main { max-width: 620px; margin: 0 auto; padding: 14px 16px 24px; }
+header.top { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 16px 0; max-width: 620px; margin: 0 auto; }
+.brand { font-family: "HyperMono"; font-size: 13px; color: var(--soft); }
+h1 { font-weight: 800; font-size: 28px; line-height: 1.15; margin: 6px 0 12px; }
+h2 { font-weight: 800; font-size: 19px; margin: 22px 0 8px; }
+p { margin: 0 0 10px; }
+.small { font-size: 14px; color: var(--soft); }
+.mono { font-family: "HyperMono"; }
+.card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; margin: 12px 0; }
+label { display: block; font-weight: 600; font-size: 15px; margin: 12px 0 4px; }
+input[type=text], input[type=number], input[type=date], input[type=time], textarea, select {
+  width: 100%; font: inherit; color: var(--ink); background: var(--paper); border: 1.5px solid var(--rule); border-radius: 8px; padding: 10px 12px; min-height: 46px; }
+textarea { min-height: 70px; resize: vertical; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.btn { background: var(--slate); color: var(--slate-ink); border: none; border-radius: 10px; padding: 12px 18px; min-height: 48px; font-weight: 600; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--rule); }
+.btn.wide { width: 100%; margin-top: 14px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 120px; }
+.scale { display: grid; grid-template-columns: repeat(11, 1fr); gap: 4px; }
+.scale button { min-height: 44px; border: 1.5px solid var(--rule); background: var(--paper); border-radius: 8px; font-family: "HyperMono"; font-size: 15px; padding: 0; }
+.scale button[aria-pressed=true] { background: var(--slate); color: var(--slate-ink); border-color: var(--slate); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { border: 1.5px solid var(--rule); background: var(--paper); border-radius: 999px; padding: 8px 14px; min-height: 44px; font-size: 15px; }
+.chips button[aria-pressed=true] { background: var(--slate); color: var(--slate-ink); border-color: var(--slate); }
+.ckhead { display: flex; justify-content: space-between; align-items: baseline; margin: 14px 0 6px; font-weight: 600; }
+.hi { display: flex; align-items: center; justify-content: space-between; }
+.hi .num { font-family: "HyperMono"; font-size: 34px; font-weight: 400; }
+.daynav { display: flex; align-items: center; gap: 8px; }
+.daynav button { min-width: 48px; }
+ul.list { list-style: none; padding: 0; margin: 0; }
+ul.list li { border-bottom: 1px solid var(--rule); padding: 10px 0; display: flex; gap: 10px; justify-content: space-between; align-items: center; }
+ul.list li button.link { background: none; border: none; text-align: left; padding: 6px 0; flex: 1; min-height: 44px; }
+.tag { font-family: "HyperMono"; font-size: 13px; color: var(--soft); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th { font-family: "HyperMono"; font-weight: 400; font-size: 12px; text-align: left; color: var(--soft); border-bottom: 1.5px solid var(--ink); padding: 6px 4px; }
+td { border-bottom: 1px solid var(--rule); padding: 8px 4px; }
+td.n { font-family: "HyperMono"; text-align: right; }
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--rule); display: flex; justify-content: center;
+  padding-bottom: env(safe-area-inset-bottom); z-index: 5; }
+nav.tabs button { flex: 1; max-width: 124px; background: none; border: none; padding: 10px 2px 12px; min-height: 60px; font-size: 13px; color: var(--soft); display: flex; flex-direction: column; align-items: center; gap: 3px; }
+nav.tabs button[aria-current=page] { color: var(--ink); font-weight: 600; }
+nav.tabs svg { width: 22px; height: 22px; }
+.note { border-left: 3px solid var(--plum); padding: 4px 0 4px 12px; margin: 12px 0; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(86px + env(safe-area-inset-bottom)); background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 10px; font-size: 15px; z-index: 9; }
+.dialog-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 10; padding: 20px; }
+.dialog { background: var(--paper); border-radius: 12px; padding: 18px; max-width: 420px; width: 100%; }
+.empty { color: var(--soft); padding: 14px 0; }
+svg.chart text { font-family: "HyperMono"; fill: var(--soft); font-size: 10px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top"><span class="brand">Too Much Input</span><span class="brand" id="hdrDate"></span></header>
+<main id="app" tabindex="-1"></main>
+<nav class="tabs" aria-label="Sections">
+  <button data-view="today" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg>Today</button>
+  <button data-view="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add moment</button>
+  <button data-view="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>History</button>
+  <button data-view="patterns"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 19V11M10 19V6M15 19v-5M20 19V9"/></svg>Patterns</button>
+  <button data-view="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="18" cy="12" r="1.5" fill="currentColor"/></svg>More</button>
+</nav>
+<div id="live" class="sr" aria-live="polite"></div>
+<script>
+"use strict";
+const SENSES = ["Sight","Sound","Touch","Smell","Taste","Vestibular","Proprioception","Interoception"];
+const SCALE = [[0,"Not bothered. Background."],[2,"I notice it. Mildly annoying."],[4,"Hard to ignore. Focus is slipping."],[6,"Irritable, short answers, jaw or shoulders tight."],[8,"I need to leave or make it stop."],[10,"Meltdown or shutdown. I can't function."]];
+const KEY = "tmi.log.v1";
+
+/* ---------- storage ---------- */
+function blank() { return { days: {}, moments: [], settings: { sleepCut: 6, maskCut: 4, cycFrom: 24, cycTo: 28 } }; }
+let mem = null, storageOK = true;
+function load() {
+  try { const raw = localStorage.getItem(KEY); mem = raw ? JSON.parse(raw) : blank(); }
+  catch (e) { storageOK = false; mem = mem || blank(); }
+  mem.settings = Object.assign(blank().settings, mem.settings || {});
+  mem.days = mem.days || {}; mem.moments = mem.moments || [];
+  return mem;
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(mem)); storageOK = true; } catch (e) { storageOK = false; } }
+load();
+
+/* ---------- helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function iso(d) { const z = n => String(n).padStart(2, "0"); return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate()); }
+function todayISO() { return iso(new Date()); }
+function nowTime() { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+function parseISO(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+function nice(s) { return parseISO(s).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); }
+function addDays(s, n) { const d = parseISO(s); d.setDate(d.getDate() + n); return iso(d); }
+function day(s) { return mem.days[s] || (mem.days[s] = { checkins: {} }); }
+function num(v) { return v === "" || v == null || isNaN(+v) ? null : +v; }
+function highest(s) {
+  const d = mem.days[s]; const vals = [];
+  if (d && d.checkins) Object.values(d.checkins).forEach(v => { if (v != null) vals.push(v); });
+  mem.moments.forEach(m => { if (m.date === s && m.rating != null) vals.push(m.rating); });
+  return vals.length ? Math.max(...vals) : null;
+}
+function avg(a) { return a.length ? Math.round(a.reduce((x, y) => x + y, 0) / a.length * 10) / 10 : null; }
+function toast(msg) { document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); $("#live").textContent = msg; setTimeout(() => t.remove(), 2200); }
+function scaleHTML(name, val) {
+  return `<div class="scale" role="group" aria-label="${esc(name)}">` + Array.from({ length: 11 }, (_, i) =>
+    `<button type="button" data-v="${i}" aria-pressed="${val === i}" aria-label="${i}">${i}</button>`).join("") + `</div>`;
+}
+function confirmBox(msg, yes, onYes) {
+  const bg = document.createElement("div"); bg.className = "dialog-bg";
+  bg.innerHTML = `<div class="dialog" role="dialog" aria-modal="true" aria-label="Confirm"><p>${esc(msg)}</p><div class="row"><button class="btn ghost" data-a="no">Cancel</button><button class="btn" data-a="yes">${esc(yes)}</button></div></div>`;
+  document.body.appendChild(bg); $("[data-a=no]", bg).focus();
+  bg.addEventListener("click", e => { const a = e.target.dataset.a; if (a === "yes") { bg.remove(); onYes(); } else if (a === "no" || e.target === bg) bg.remove(); });
+}
+
+/* ---------- views ---------- */
+let state = { view: "today", date: todayISO(), draft: null };
+const views = {};
+
+views.today = () => {
+  const s = state.date, d = day(s), hi = highest(s);
+  const ms = mem.moments.filter(m => m.date === s).sort((a, b) => (a.time || "").localeCompare(b.time || ""));
+  const ck = (key, label) => `<div class="ckhead"><span>${label}</span><span class="tag">${d.checkins[key] ?? "not yet"}</span></div>${scaleHTML(label + " check-in", d.checkins[key] ?? null).replace('class="scale"', `class="scale" data-ck="${key}"`)}`;
+  return `
+<div class="daynav"><button class="btn ghost" data-act="prev" aria-label="Previous day">&larr;</button>
+<h1 style="flex:1;text-align:center;margin:0">${s === todayISO() ? "Today" : esc(nice(s))}</h1>
+<button class="btn ghost" data-act="next" aria-label="Next day" ${s >= todayISO() ? "disabled" : ""}>&rarr;</button></div>
+<div class="card hi"><div><div style="font-weight:600">Highest today</div><div class="small">From check-ins and moments</div></div><div class="num" aria-live="polite">${hi ?? "–"}</div></div>
+<div class="card"><div style="font-weight:800;font-size:18px">Check-ins</div><p class="small">Tap a number at each one. Alarms help, since inside signals often show up late.</p>
+${ck("morning", "Morning")}${ck("afternoon", "Afternoon")}${ck("bedtime", "Bedtime")}</div>
+<div class="card"><div style="font-weight:800;font-size:18px">Moments</div>
+${ms.length ? `<ul class="list">${ms.map(m => `<li><button class="link" data-edit="${m.id}"><span class="tag">${esc(m.time || "")} · ${esc(m.sense || "no sense")} · ${m.rating ?? "–"}</span><br>${esc(m.input || m.kind)}</button></li>`).join("")}</ul>` : `<p class="empty">Nothing logged for this day yet.</p>`}
+<button class="btn wide" data-act="add">Add a moment</button></div>
+<div class="card"><div style="font-weight:800;font-size:18px">Tonight's baseline</div>
+<div class="row"><div><label for="b-sleep">Sleep, hours</label><input id="b-sleep" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="${d.sleep ?? ""}"></div>
+<div><label for="b-mask">Hours masking</label><input id="b-mask" type="number" inputmode="decimal" min="0" max="24" step="0.5" value="${d.masking ?? ""}"></div></div>
+<div class="row"><div><label for="b-ate">Ate on time?</label><select id="b-ate"><option value=""></option><option ${d.ate === "Y" ? "selected" : ""}>Y</option><option ${d.ate === "N" ? "selected" : ""}>N</option></select></div>
+<div><label for="b-cyc">Cycle day (optional)</label><input id="b-cyc" type="number" inputmode="numeric" min="1" max="60" value="${d.cycle ?? ""}"></div></div>
+<label>Stress, 0 to 10</label>${scaleHTML("Stress", d.stress ?? null).replace('class="scale"', 'class="scale" data-stress="1"')}
+<label for="b-notes">Anything else</label><textarea id="b-notes" placeholder="Illness, caffeine, a hard conversation, a day off">${esc(d.notes || "")}</textarea>
+<p class="small" style="margin-top:8px">Saves as you type.</p></div>`;
+};
+
+views.add = () => {
+  const m = state.draft || { id: null, date: state.date, time: nowTime(), kind: "Overload", sense: "", rating: null, where: "", input: "", body: "", helped: "" };
+  state.draft = m;
+  return `<h1>${m.id ? "Edit moment" : "Add a moment"}</h1>
+<form id="mform" novalidate>
+<div class="chips" role="group" aria-label="Kind">${["Overload", "Relief", "Check-in"].map(k => `<button type="button" data-kind="${k}" aria-pressed="${m.kind === k}">${k}</button>`).join("")}</div>
+<label>Which sense</label><div class="chips" role="group" aria-label="Sense">${SENSES.map(s => `<button type="button" data-sense="${s}" aria-pressed="${m.sense === s}">${s}</button>`).join("")}</div>
+<label>Rating, 0 to 10</label>${scaleHTML("Rating", m.rating).replace('class="scale"', 'class="scale" data-rating="1"')}
+<div class="row"><div><label for="m-date">Date</label><input id="m-date" type="date" value="${m.date}" max="${todayISO()}"></div><div><label for="m-time">Time</label><input id="m-time" type="time" value="${esc(m.time)}"></div></div>
+<label for="m-where">Where</label><input id="m-where" type="text" value="${esc(m.where)}" placeholder="Grocery store">
+<label for="m-input">What input</label><input id="m-input" type="text" value="${esc(m.input)}" placeholder="Overhead music plus freezer buzz">
+<label for="m-body">Body signs</label><input id="m-body" type="text" value="${esc(m.body)}" placeholder="Jaw tight, snapped at someone">
+<label for="m-helped">What helped</label><input id="m-helped" type="text" value="${esc(m.helped)}" placeholder="Earbuds in, finished in the car">
+<button class="btn wide" type="submit">Save</button>
+${m.id ? `<button class="btn ghost wide" type="button" data-act="delmoment">Delete this moment</button>` : ""}
+<button class="btn ghost wide" type="button" data-act="cancel">Cancel</button>
+</form>
+<details class="card"><summary style="font-weight:600;min-height:32px">The rating scale</summary><table>${SCALE.map(([n, t]) => `<tr><td class="n" style="width:36px">${n}</td><td>${t}</td></tr>`).join("")}</table></details>`;
+};
+
+views.history = () => {
+  const dates = new Set(Object.keys(mem.days).filter(k => { const d = mem.days[k]; return d && (Object.keys(d.checkins || {}).length || d.sleep != null || d.stress != null || d.notes); }));
+  mem.moments.forEach(m => dates.add(m.date));
+  const list = [...dates].sort().reverse();
+  return `<h1>History</h1>${list.length ? `<ul class="list">${list.map(s => {
+    const n = mem.moments.filter(m => m.date === s).length;
+    return `<li><button class="link" data-open="${s}">${esc(nice(s))}<br><span class="tag">${n} moment${n === 1 ? "" : "s"}${mem.days[s] && mem.days[s].cycle ? " · cycle day " + mem.days[s].cycle : ""}</span></button><span class="mono" style="font-size:22px" aria-label="Highest rating">${highest(s) ?? "–"}</span></li>`;
+  }).join("")}</ul>` : `<p class="empty">No days logged yet. Start on the Today tab.</p>`}`;
+};
+
+function chart30() {
+  const end = todayISO(); const days = Array.from({ length: 30 }, (_, i) => addDays(end, i - 29));
+  const W = 330, H = 150, pl = 22, pb = 22, bw = (W - pl) / 30;
+  let bars = "", labels = "";
+  days.forEach((s, i) => {
+    const h = highest(s); const x = pl + i * bw;
+    if (h != null) { const bh = (H - pb - 8) * h / 10; bars += `<rect x="${x + 1}" y="${H - pb - bh}" width="${bw - 2}" height="${Math.max(bh, 1.5)}" fill="var(--slate)" rx="1"><title>${nice(s)}: ${h}</title></rect>`; }
+    const c = mem.days[s] && mem.days[s].cycle; if (c) labels += `<text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${c}</text>`;
+  });
+  let grid = ""; [0, 5, 10].forEach(v => { const y = H - pb - (H - pb - 8) * v / 10; grid += `<line x1="${pl}" x2="${W}" y1="${y}" y2="${y}" stroke="var(--rule)" stroke-width="1"/><text x="${pl - 4}" y="${y + 3}" text-anchor="end">${v}</text>`; });
+  const logged = days.filter(s => highest(s) != null).length;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Highest rating per day for the last 30 days. ${logged} days logged.">${grid}${bars}${labels}</svg>
+<p class="small">Last 30 days, highest rating per day. Numbers under the bars are cycle days, if you logged them.</p>`;
+}
+
+views.patterns = () => {
+  const ms = mem.moments; const st = mem.settings;
+  const bySense = SENSES.map(s => { const r = ms.filter(m => m.sense === s && m.rating != null).map(m => m.rating); return { s, n: ms.filter(m => m.sense === s).length, a: avg(r), hi: r.filter(v => v >= 7).length }; });
+  const bucket = (lo, hi) => { const r = ms.filter(m => m.time && m.time >= lo && m.time < hi && m.rating != null).map(m => m.rating); return { n: r.length, a: avg(r) }; };
+  const tb = [["Morning, before noon", bucket("00:00", "12:00")], ["Afternoon, noon to 5", bucket("12:00", "17:00")], ["Evening, 5 and later", bucket("17:00", "24:00")]];
+  const dayList = Object.keys(mem.days).filter(k => highest(k) != null);
+  const cmp = (field, cut) => {
+    const below = [], above = [];
+    dayList.forEach(k => { const v = num(mem.days[k][field]); if (v == null) return; (v < cut ? below : above).push(highest(k)); });
+    return [avg(below), avg(above), below.length, above.length];
+  };
+  const [sb, sa, sbn, san] = cmp("sleep", st.sleepCut), [mb, ma, mbn, man] = cmp("masking", st.maskCut);
+  const inC = [], outC = [];
+  dayList.forEach(k => { const c = num(mem.days[k].cycle); if (c == null) return; (c >= st.cycFrom && c <= st.cycTo ? inC : outC).push(highest(k)); });
+  const f = (v, n) => v == null ? `<span class="small">not enough data</span>` : `${v} <span class="small">(${n} day${n === 1 ? "" : "s"})</span>`;
+  const total = ms.length;
+  return `<h1>Patterns</h1>
+${total + dayList.length < 3 ? `<div class="note"><p style="margin:0">Patterns need a week or two of logging before they mean much. Everything here fills in as you go.</p></div>` : ""}
+<div class="card">${chart30()}</div>
+<h2>By sense</h2>
+<table><tr><th>Sense</th><th style="text-align:right">Times</th><th style="text-align:right">Avg</th><th style="text-align:right">7+</th></tr>
+${bySense.map(r => `<tr><td>${r.s}</td><td class="n">${r.n}</td><td class="n">${r.a ?? "–"}</td><td class="n">${r.hi}</td></tr>`).join("")}</table>
+<h2>Time of day</h2>
+<table><tr><th>When</th><th style="text-align:right">Times</th><th style="text-align:right">Avg</th></tr>${tb.map(([n, b]) => `<tr><td>${n}</td><td class="n">${b.n}</td><td class="n">${b.a ?? "–"}</td></tr>`).join("")}</table>
+<h2>Baseline checks</h2>
+<p class="small">Average highest rating on days on each side of a cut-off. Change the cut-offs to whatever line matters for you.</p>
+<div class="card"><label for="c-sleep">Sleep cut-off, hours</label><input id="c-sleep" type="number" step="0.5" value="${st.sleepCut}">
+<table style="margin-top:8px"><tr><td>Less sleep than that</td><td class="n">${f(sb, sbn)}</td></tr><tr><td>That much or more</td><td class="n">${f(sa, san)}</td></tr></table></div>
+<div class="card"><label for="c-mask">Masking cut-off, hours</label><input id="c-mask" type="number" step="0.5" value="${st.maskCut}">
+<table style="margin-top:8px"><tr><td>Less masking than that</td><td class="n">${f(mb, mbn)}</td></tr><tr><td>That much or more</td><td class="n">${f(ma, man)}</td></tr></table></div>
+<div class="card"><div class="row"><div><label for="c-from">Cycle days from</label><input id="c-from" type="number" value="${st.cycFrom}"></div><div><label for="c-to">to</label><input id="c-to" type="number" value="${st.cycTo}"></div></div>
+<table style="margin-top:8px"><tr><td>Inside those cycle days</td><td class="n">${f(avg(inC), inC.length)}</td></tr><tr><td>Other logged cycle days</td><td class="n">${f(avg(outC), outC.length)}</td></tr></table>
+<p class="small" style="margin-top:8px">Day 1 is the first day of a period. 24 to 28 is the week before a typical period.</p></div>
+<p class="small">These are your own numbers, not a diagnosis. A handful of days can swing an average, so look for patterns that hold over weeks.</p>`;
+};
+
+views.more = () => `<h1>More</h1>
+<div class="card"><div style="font-weight:800;font-size:18px">Your data</div>
+<p>Everything you log stays in this browser on this device. There's no account and nothing is sent anywhere. That also means if you clear your browser data or lose your phone, the log goes with it, so export a backup now and then.</p>
+${storageOK ? "" : `<div class="note"><p style="margin:0">This browser isn't letting the app save. Your entries will disappear when you close it. Open the app in your regular browser, or add it to your home screen.</p></div>`}
+<button class="btn wide" data-act="exp-log">Export moments as CSV</button>
+<button class="btn wide" data-act="exp-base">Export daily baseline as CSV</button>
+<button class="btn ghost wide" data-act="exp-json">Export a full backup</button>
+<label for="imp" class="btn ghost wide" style="display:flex;align-items:center;justify-content:center;margin-top:14px">Restore a backup</label>
+<input id="imp" type="file" accept=".json,application/json" class="sr">
+<p class="small" style="margin-top:10px">Using the Too Much Input spreadsheet too? The moments file pastes straight into the Log tab. From the baseline file, paste Date through Hours masking into the Baseline tab; the spreadsheet works out the highest rating itself.</p>
+<div id="copyArea" hidden><label for="copyText">If the download didn't start, copy this instead</label><textarea id="copyText" rows="6" readonly></textarea><button class="btn ghost wide" data-act="copy">Copy</button></div>
+</div>
+<div class="card"><div style="font-weight:800;font-size:18px">Add it to your home screen</div>
+<p><span style="font-weight:600">iPhone:</span> open this page in Safari, tap Share, then Add to Home Screen.</p>
+<p><span style="font-weight:600">Android:</span> open it in Chrome, tap the menu, then Install app or Add to Home screen.</p>
+<p class="small">Once it's installed it works offline.</p></div>
+<div class="card"><div style="font-weight:800;font-size:18px">Read this</div>
+<p>This app is for self-observation. It isn't a diagnosis, a treatment plan, or a substitute for a clinician who knows you. If overload is tipping into panic attacks, shutdowns that last for days, or thoughts of hurting yourself, bring in a professional. In the US you can call or text 988 at any hour.</p>
+<p class="small">Too Much Input by @thatgirlwiththegreyhair. Version 1.0.</p></div>
+<button class="btn ghost wide" data-act="wipe">Delete all my data</button>`;
+
+/* ---------- render + events ---------- */
+function render(focus) {
+  $("#app").innerHTML = views[state.view]();
+  document.querySelectorAll("nav.tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.view === state.view ? "page" : "false"));
+  $("#hdrDate").textContent = new Date().toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  if (focus) $("#app").focus();
+}
+function go(v) { if (v !== "add") state.draft = null; state.view = v; try { history.replaceState(null, "", "#" + v); } catch (e) {} render(true); window.scrollTo(0, 0); }
+
+document.querySelector("nav.tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) go(b.dataset.view); });
+
+$("#app").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const act = b.dataset.act;
+  const sc = b.closest(".scale");
+  if (sc && b.dataset.v != null) {
+    const v = +b.dataset.v;
+    if (sc.dataset.ck) { const d = day(state.date); d.checkins[sc.dataset.ck] = d.checkins[sc.dataset.ck] === v ? null : v; if (d.checkins[sc.dataset.ck] == null) delete d.checkins[sc.dataset.ck]; save(); render(); toast("Check-in saved"); return; }
+    if (sc.dataset.stress) { const d = day(state.date); d.stress = d.stress === v ? null : v; save(); render(); return; }
+    if (sc.dataset.rating) { state.draft.rating = state.draft.rating === v ? null : v; sc.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", +x.dataset.v === state.draft.rating)); return; }
+  }
+  if (b.dataset.kind) { state.draft.kind = b.dataset.kind; b.parentNode.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); return; }
+  if (b.dataset.sense) { state.draft.sense = state.draft.sense === b.dataset.sense ? "" : b.dataset.sense; b.parentNode.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x.dataset.sense === state.draft.sense)); return; }
+  if (b.dataset.edit) { state.draft = Object.assign({}, mem.moments.find(m => m.id === b.dataset.edit)); state.view = "add"; render(true); return; }
+  if (b.dataset.open) { state.date = b.dataset.open; go("today"); return; }
+  if (act === "prev") { state.date = addDays(state.date, -1); render(); }
+  if (act === "next" && state.date < todayISO()) { state.date = addDays(state.date, 1); render(); }
+  if (act === "add") { state.draft = null; state.view = "add"; views.add(); state.draft.date = state.date; render(true); }
+  if (act === "cancel") { go("today"); }
+  if (act === "delmoment") confirmBox("Delete this moment?", "Delete", () => { mem.moments = mem.moments.filter(m => m.id !== state.draft.id); save(); toast("Deleted"); go("today"); });
+  if (act === "exp-log") exportFile("too-much-input-moments.csv", logCSV(), "text/csv");
+  if (act === "exp-base") exportFile("too-much-input-baseline.csv", baseCSV(), "text/csv");
+  if (act === "exp-json") exportFile("too-much-input-backup.json", JSON.stringify(mem, null, 1), "application/json");
+  if (act === "copy") { const t = $("#copyText"); t.select(); try { navigator.clipboard.writeText(t.value).then(() => toast("Copied"), () => toast("Select the text and copy it")); } catch (err) { toast("Select the text and copy it"); } }
+  if (act === "wipe") confirmBox("Delete everything you've logged on this device? This can't be undone. Export a backup first if you might want it.", "Delete all", () => { mem = blank(); save(); toast("All data deleted"); go("today"); });
+});
+
+$("#app").addEventListener("input", e => {
+  const t = e.target, d = state.view === "today" ? day(state.date) : null;
+  if (d) {
+    if (t.id === "b-sleep") d.sleep = num(t.value);
+    if (t.id === "b-mask") d.masking = num(t.value);
+    if (t.id === "b-cyc") d.cycle = num(t.value);
+    if (t.id === "b-ate") d.ate = t.value || null;
+    if (t.id === "b-notes") d.notes = t.value;
+    save(); return;
+  }
+  if (state.view === "patterns") {
+    const st = mem.settings, v = num(t.value); if (v == null) return;
+    if (t.id === "c-sleep") st.sleepCut = v; if (t.id === "c-mask") st.maskCut = v; if (t.id === "c-from") st.cycFrom = v; if (t.id === "c-to") st.cycTo = v;
+    save();
+  }
+});
+$("#app").addEventListener("change", e => {
+  if (state.view === "patterns" && e.target.matches("input")) { const id = e.target.id; render(); const el = document.getElementById(id); if (el) el.focus(); }
+  if (state.view === "today" && e.target.id === "b-ate") { day(state.date).ate = e.target.value || null; save(); }
+  if (e.target.id === "imp" && e.target.files[0]) {
+    e.target.files[0].text().then(txt => {
+      let data; try { data = JSON.parse(txt); } catch (err) { toast("That file isn't a backup from this app"); return; }
+      if (!data || !data.days || !Array.isArray(data.moments)) { toast("That file isn't a backup from this app"); return; }
+      confirmBox("Replace what's on this device with this backup?", "Replace", () => { mem = Object.assign(blank(), data); mem.settings = Object.assign(blank().settings, data.settings || {}); save(); toast("Backup restored"); go("today"); });
+    });
+  }
+});
+$("#app").addEventListener("submit", e => {
+  e.preventDefault(); const m = state.draft;
+  m.date = $("#m-date").value || state.date; m.time = $("#m-time").value; m.where = $("#m-where").value.trim(); m.input = $("#m-input").value.trim();
+  m.body = $("#m-body").value.trim(); m.helped = $("#m-helped").value.trim();
+  if (m.rating == null && !m.input) { toast("Add a rating or say what the input was"); return; }
+  if (m.id) { const i = mem.moments.findIndex(x => x.id === m.id); mem.moments[i] = m; }
+  else { m.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6); mem.moments.push(m); }
+  save(); state.date = m.date; toast("Saved"); go("today");
+});
+
+/* ---------- export ---------- */
+function csvCell(v) { v = v == null ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function toCSV(rows) { return rows.map(r => r.map(csvCell).join(",")).join("\n") + "\n"; }
+function usDate(s) { const [y, m, d] = s.split("-"); return `${+m}/${+d}/${y}`; }
+function logCSV() {
+  const rows = [["Date", "Time", "Check-in or event", "Where", "Sense", "What input", "Rating 0 to 10", "Body signs", "What helped"]];
+  const body = [];
+  mem.moments.forEach(m => body.push([m.date + (m.time || ""), [usDate(m.date), m.time, m.kind === "Overload" ? "Event" : m.kind, m.where, m.sense, m.input, m.rating, m.body, m.helped]]));
+  Object.keys(mem.days).forEach(s => { const c = mem.days[s].checkins || {}; [["morning", "09:00"], ["afternoon", "15:00"], ["bedtime", "21:00"]].forEach(([k, t]) => {
+    if (c[k] != null) body.push([s + t, [usDate(s), t, "Check-in", "", "", k + " check-in", c[k], "", ""]]); }); });
+  body.sort((a, b) => a[0].localeCompare(b[0])).forEach(r => rows.push(r[1]));
+  return toCSV(rows);
+}
+function baseCSV() {
+  const rows = [["Date", "Sleep, hours", "Ate on time? Y/N", "Stress 0 to 10", "Hours masking", "Cycle day (optional)", "Anything else", "Highest rating today"]];
+  Object.keys(mem.days).sort().forEach(s => { const d = mem.days[s]; const h = highest(s);
+    if (d.sleep == null && d.stress == null && d.masking == null && d.cycle == null && !d.ate && !d.notes && h == null) return;
+    rows.push([usDate(s), d.sleep, d.ate, d.stress, d.masking, d.cycle, d.notes, h]); });
+  return toCSV(rows);
+}
+let dlCap = null;
+async function exportFile(name, text, type) {
+  if (dlCap) { try { await dlCap.save({ filename: name, data: new Blob([text], { type }) }); return; } catch (err) { /* fall through */ } }
+  try {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  } catch (err) { /* sandboxed */ }
+  const area = $("#copyArea"); if (area) { area.hidden = false; $("#copyText").value = text; }
+}
+if (window.claude && typeof window.claude.use === "function") {
+  window.claude.use("downloads").then(d => { dlCap = d; }).catch(() => {});
+}
+
+/* ---------- boot ---------- */
+const startHash = (location.hash || "").slice(1);
+if (views[startHash] && startHash !== "add") state.view = startHash;
+render();
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (views[h] && h !== state.view) go(h); });
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
